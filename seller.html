@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>出品者管理 - NetSuper</title>
+    <!-- Tailwind CSSを読み込みます -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 既存のカスタムスタイルシートを読み込みます -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Lucide Iconsを読み込みます -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-stone-50 font-sans">
+
+    <!-- ヘッダーエリア -->
+    <header class="bg-emerald-800 text-white sticky top-0 z-50 shadow-md">
+        <div class="container mx-auto px-4 flex items-center justify-between h-16">
+            <div class="flex-shrink-0">
+                <h1 class="text-2xl font-bold text-white">NetSuper 出品者パネル</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                 <div class="flex items-center space-x-2">
+                    <i data-lucide="user-circle" class="w-5 h-5"></i>
+                    <span class="hidden md:inline">事業者A 様</span>
+                </div>
+                <button id="logout-button" class="flex items-center hover:bg-emerald-700 p-2 rounded">
+                    <i data-lucide="log-out" class="w-5 h-5 mr-1"></i>
+                    <span class="hidden md:inline">ログアウト</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- ★ 更新点: 事業者情報セクションを追加 -->
+        <div class="mb-12">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-slate-800">事業者情報</h2>
+                <button id="edit-info-button" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-colors flex items-center">
+                    <i data-lucide="edit" class="w-5 h-5 mr-2"></i>
+                    情報を編集する
+                </button>
+            </div>
+            <div id="seller-info-display" class="bg-white p-6 rounded-lg shadow-sm border">
+                <!-- 事業者情報はJavaScriptによってここに挿入されます -->
+                <p class="text-gray-500 text-center">事業者情報が設定されていません。</p>
+            </div>
+        </div>
+
+        <!-- 商品管理 -->
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-slate-800">商品管理</h2>
+            <button id="add-product-button" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-colors flex items-center">
+                <i data-lucide="plus-circle" class="w-5 h-5 mr-2"></i>
+                新規商品を追加
+            </button>
+        </div>
+        <div id="seller-product-list" class="bg-white p-6 rounded-lg shadow-sm border">
+            <!-- 出品した商品はJavaScriptによってここに挿入されます -->
+             <p class="text-gray-500 text-center">まだ商品が登録されていません。</p>
+        </div>
+
+        <!-- メルマガ管理 -->
+        <div class="mt-12">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-slate-800">メルマガ配信</h2>
+                <button id="add-newsletter-button" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-colors flex items-center">
+                    <i data-lucide="mail-plus" class="w-5 h-5 mr-2"></i>
+                    新規メルマガを作成
+                </button>
+            </div>
+            <div id="newsletter-list" class="bg-white p-6 rounded-lg shadow-sm border">
+                <!-- 配信済みメルマガはJavaScriptによってここに挿入されます -->
+                <p class="text-gray-500 text-center">まだ配信されたメルマガはありません。</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- ★ 更新点: 事業者情報編集モーダルを追加 -->
+    <div id="seller-info-modal" class="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4 hidden">
+        <div class="bg-white rounded-lg p-8 max-w-lg w-full relative">
+            <button id="seller-info-modal-close-button" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-3xl">&times;</button>
+            <h2 class="text-2xl font-bold text-center mb-6">事業者情報を編集</h2>
+            <form id="seller-info-form">
+                <div class="mb-4">
+                    <label for="seller-name" class="block text-sm font-medium text-gray-700 mb-1">事業者名</label>
+                    <input type="text" id="seller-name" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500" required>
+                </div>
+                <div class="mb-4">
+                    <label for="seller-image-url" class="block text-sm font-medium text-gray-700 mb-1">プロフィール画像URL</label>
+                    <input type="text" id="seller-image-url" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500" placeholder="https://placehold.co/...">
+                </div>
+                <div class="mb-4">
+                    <label for="seller-description" class="block text-sm font-medium text-gray-700 mb-1">事業者紹介</label>
+                    <textarea id="seller-description" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"></textarea>
+                </div>
+                <div class="mb-6">
+                    <label for="seller-contact" class="block text-sm font-medium text-gray-700 mb-1">連絡先</label>
+                    <input type="text" id="seller-contact" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500" placeholder="メールアドレスや電話番号">
+                </div>
+                <div class="flex justify-end">
+                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-6 rounded-lg shadow-sm transition-colors">
+                        保存する
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 商品追加/編集モーダル -->
+    <div id="product-modal" class="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4 hidden">
+        <div class="bg-white rounded-lg p-8 max-w-lg w-full relative">
+            <button id="modal-close-button" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-3xl">&times;</button>
+            <h2 id="modal-title" class="text-2xl font-bold text-center mb-6">新規商品を追加</h2>
+            <form id="product-form">
+                <!-- 隠しフィールド: 編集中の商品IDを保持 -->
+                <input type="hidden" id="product-id">
+
+                <div class="mb-4">
+                    <label for="product-name" class="block text-sm font-medium text-gray-700 mb-1">商品名</label>
+                    <input type="text" id="product-name" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500" required>
+                </div>
+                <div class="mb-4">
+                    <label for="product-image-url" class="block text-sm font-medium text-gray-700 mb-1">画像URL</label>
+                    <input type="text" id="product-image-url" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500" placeholder="https://placehold.co/..." required>
+                </div>
+                <div class="mb-4">
+                    <label for="product-description" class="block text-sm font-medium text-gray-700 mb-1">商品説明</label>
+                    <textarea id="product-description" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label for="product-regular-price" class="block text-sm font-medium text-gray-700 mb-1">一般価格 (円)</label>
+                        <input type="number" id="product-regular-price" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500" required>
+                    </div>
+                    <div>
+                        <label for="product-member-price" class="block text-sm font-medium text-gray-700 mb-1">会員価格 (円)</label>
+                        <input type="number" id="product-member-price" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500" required>
+                    </div>
+                </div>
+                <div class="flex justify-end">
+                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-6 rounded-lg shadow-sm transition-colors">
+                        保存する
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- メルマガ作成モーダル -->
+    <div id="newsletter-modal" class="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4 hidden">
+        <div class="bg-white rounded-lg p-8 max-w-2xl w-full relative">
+            <button id="newsletter-modal-close-button" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-3xl">&times;</button>
+            <h2 class="text-2xl font-bold text-center mb-6">新規メルマガを作成</h2>
+            <form id="newsletter-form">
+                <div class="mb-4">
+                    <label for="newsletter-subject" class="block text-sm font-medium text-gray-700 mb-1">件名</label>
+                    <input type="text" id="newsletter-subject" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500" required>
+                </div>
+                <div class="mb-4">
+                    <label for="newsletter-image-url" class="block text-sm font-medium text-gray-700 mb-1">画像URL (任意)</label>
+                    <input type="text" id="newsletter-image-url" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500" placeholder="https://placehold.co/...">
+                </div>
+                <div class="mb-6">
+                    <label for="newsletter-body" class="block text-sm font-medium text-gray-700 mb-1">本文</label>
+                    <textarea id="newsletter-body" rows="8" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500" required></textarea>
+                </div>
+                <div class="flex justify-end">
+                    <button type="submit" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-6 rounded-lg shadow-sm transition-colors">
+                        配信する
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- 通知エリア -->
+    <div id="notification" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-lg shadow-lg" style="display: none;">
+        <!-- 通知メッセージはJavaScriptで設定されます -->
+    </div>
+    
+    <!-- 出品者ページ用のJavaScriptファイルを読み込みます -->
+    <script src="seller.js"></script>
+</body>
+</html>
+

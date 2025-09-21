@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>会員登録 - NetSuper</title>
+    <!-- Tailwind CSSを読み込みます -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 既存のカスタムスタイルシートを読み込みます -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Lucide Iconsを読み込みます -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-stone-50 font-sans">
+
+    <!-- ヘッダーエリア -->
+    <header class="bg-emerald-800 text-white sticky top-0 z-50 shadow-md">
+        <div class="container mx-auto px-4 flex items-center justify-between h-16">
+            <div class="flex-shrink-0">
+                <!-- customer.htmlへのリンクを想定 -->
+                <a href="customer.html" class="text-2xl font-bold text-white">NetSuper</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                 <!-- customer.htmlへのリンクを想定 -->
+                 <a href="customer.html" class="flex items-center hover:bg-emerald-700 p-2 rounded">
+                    <i data-lucide="shopping-bag" class="w-5 h-5 mr-1"></i>
+                    <span class="hidden md:inline">ストアに戻る</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <div class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-sm border">
+            <h1 class="text-3xl font-bold text-center text-slate-800 mb-4">会員プランのご案内</h1>
+            <p class="text-center text-gray-600 mb-8">会員になると、いつでもお得な価格でお買い物ができます。</p>
+
+            <!-- 会員特典 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 text-center">
+                <div class="p-4 bg-emerald-50 rounded-lg">
+                    <i data-lucide="tag" class="mx-auto h-10 w-10 text-emerald-600 mb-2"></i>
+                    <h3 class="font-semibold">会員限定価格</h3>
+                    <p class="text-sm text-gray-500">人気の商品がいつでもお得に。</p>
+                </div>
+                <div class="p-4 bg-emerald-50 rounded-lg">
+                    <i data-lucide="truck" class="mx-auto h-10 w-10 text-emerald-600 mb-2"></i>
+                    <h3 class="font-semibold">送料無料</h3>
+                    <p class="text-sm text-gray-500">一定金額以上のお買い物で送料が無料に。</p>
+                </div>
+                <div class="p-4 bg-emerald-50 rounded-lg">
+                    <i data-lucide="mail" class="mx-auto h-10 w-10 text-emerald-600 mb-2"></i>
+                    <h3 class="font-semibold">限定ニュースレター</h3>
+                    <p class="text-sm text-gray-500">セール情報などをいち早くお届け。</p>
+                </div>
+            </div>
+
+            <h2 class="text-2xl font-bold text-center text-slate-800 mb-6">プランを選択</h2>
+            
+            <!-- プラン選択 -->
+            <div id="plan-selection" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                 <!-- 月払いプラン -->
+                 <div data-plan="monthly" class="plan-card border-2 border-gray-300 rounded-lg p-6 text-center cursor-pointer">
+                    <h3 class="text-xl font-semibold mb-2">月払いプラン</h3>
+                    <p class="text-4xl font-bold mb-4">¥500<span class="text-lg font-normal">/月</span></p>
+                </div>
+                <!-- 年払いプラン -->
+                <div data-plan="yearly" class="plan-card border-2 border-gray-300 rounded-lg p-6 text-center cursor-pointer relative">
+                    <div class="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-amber-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                        10%お得
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">年払いプラン</h3>
+                    <p class="text-4xl font-bold mb-4">¥5,400<span class="text-lg font-normal">/年</span></p>
+                </div>
+            </div>
+
+            <!-- 登録フォーム -->
+            <form id="registration-form" class="hidden">
+                <h2 class="text-xl font-bold text-slate-800 mb-4 border-b pb-2">お客様情報の入力</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">お名前</label>
+                        <input type="text" id="name" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500" required>
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">メールアドレス</label>
+                        <input type="email" id="email" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500" required>
+                    </div>
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">パスワード</label>
+                        <input type="password" id="password" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500" required>
+                    </div>
+                    
+                    <!-- 決済情報はダミー -->
+                    <h3 class="text-lg font-semibold text-slate-800 pt-4">お支払い情報</h3>
+                    <div>
+                         <label for="card-number" class="block text-sm font-medium text-gray-700 mb-1">カード番号</label>
+                        <input type="text" id="card-number" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" placeholder="0000 0000 0000 0000" disabled>
+                    </div>
+
+                    <div class="flex justify-end pt-4">
+                        <button type="submit" class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-8 rounded-lg shadow-sm transition-colors">
+                            登録を完了する
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- 通知エリア -->
+    <div id="notification" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-lg shadow-lg" style="display: none;">
+        <!-- 通知メッセージはJavaScriptで設定されます -->
+    </div>
+    
+    <!-- 会員登録ページ用のJavaScriptファイルを読み込みます -->
+    <script src="membership.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetSuper - Top</title>
+    <!-- Tailwind CSSを読み込みます -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 既存のカスタムスタイルシートを読み込みます -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Lucide Iconsを読み込みます -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-stone-50 font-sans">
+    <div id="app-container">
+        <!-- Header will be rendered here -->
+        <header id="header-container"></header>
+
+        <!-- Demo controls will be rendered here -->
+        <div id="demo-controls"></div>
+
+        <!-- Main content will be rendered here -->
+        <main id="main-container" class="container mx-auto px-4 sm:px-6 lg:px-8 py-8"></main>
+
+        <!-- Notification area -->
+        <div id="notification" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-lg shadow-lg" style="display: none;"></div>
+    </div>
+    
+    <!-- JavaScriptファイルを読み込みます -->
+    <script src="script.js"></script>
+</body>
+</html>
+

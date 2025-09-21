@@ -1,0 +1,31 @@
+/* 通知のアニメーションスタイル */
+.animate-fade-in-out {
+    /* 3秒かけてfadeInOutアニメーションを実行し、最後の状態を維持します */
+    animation: fadeInOut 3s forwards;
+}
+
+/* アニメーションのキーフレーム定義 */
+@keyframes fadeInOut {
+    0% { 
+        opacity: 0; 
+        transform: translateY(20px) translateX(-50%); /* 開始時: 透明で少し下に */
+    }
+    10% { 
+        opacity: 1; 
+        transform: translateY(0) translateX(-50%); /* 0.3秒後: 表示されて定位置に */
+    }
+    90% { 
+        opacity: 1; 
+        transform: translateY(0) translateX(-50%); /* 2.7秒後: 表示を維持 */
+    }
+    100% { 
+        opacity: 0; 
+        transform: translateY(20px) translateX(-50%); /* 3秒後: 再び透明で少し下に */
+    }
+}
+
+/* Lucide Iconsのデフォルトサイズを調整 */
+i[data-lucide] {
+    width: 1em;
+    height: 1em;
+}
