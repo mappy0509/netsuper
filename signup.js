@@ -1,5 +1,12 @@
+// Firebase関連のモジュールと共通関数をインポート
+import { auth, db } from './firebase-config.js';
+import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+import { doc, setDoc } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+import { showNotification } from './shared.js';
+
 // --- DOM要素の取得 ---
 const signupForm = document.getElementById('signup-form');
+const successMessageEl = document.getElementById('success-message');
 const postalCodeInput = document.getElementById('postal-code');
 const searchAddressButton = document.getElementById('search-address-button');
 const prefectureSelect = document.getElementById('prefecture');
@@ -34,7 +41,6 @@ function populatePrefectures() {
 
 /**
  * 郵便番号から住所を検索する処理（ダミー）
- * 実際のアプリケーションでは、APIを呼び出して住所を取得します。
  */
 function handleSearchAddress() {
     const postalCode = postalCodeInput.value;
@@ -52,40 +58,68 @@ function handleSearchAddress() {
  * 登録フォームが送信されたときの処理
  * @param {Event} event - 送信イベント
  */
-function handleSignupSubmit(event) {
+async function handleSignupSubmit(event) {
     event.preventDefault(); // デフォルトのフォーム送信をキャンセル
 
-    // フォームから入力データを取得
     const formData = new FormData(signupForm);
     const data = Object.fromEntries(formData.entries());
 
-    // バリデーション（ここでは簡単なチェックのみ）
-    if (!data['last-name'] || !data['first-name'] || !data.email || !data.password) {
-        showNotification('必須項目をすべて入力してください。');
-        return;
+    // パスワードと確認用パスワードが一致するかチェック
+    if (data.password !== data['password-confirm']) {
+        showNotification('パスワードが一致しません。');
+        return; // 一致しない場合はここで処理を中断
     }
     
-    // 登録処理が成功したと仮定
-    console.log('登録情報:', data);
+    // 電話番号が入力されているかのチェックは、HTMLのrequired属性に任せるため、JavaScript側では不要になりました。
 
-    // 登録成功の通知を表示
-    showNotification('会員登録が完了しました！ストアページに戻ります。');
-    
-    // 2秒後にストアページ（index.html）にリダイレクト
-    setTimeout(() => {
-        window.location.href = 'index.html';
-    }, 2000);
+    try {
+        // 1. Firebase Authenticationにユーザーを作成
+        const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+        const user = userCredential.user;
+
+        // 2. Firestoreにユーザーの追加情報を保存
+        // パスワード情報は除外して保存
+        const userData = {
+            'last-name': data['last-name'],
+            'first-name': data['first-name'],
+            'email': data.email,
+            'phone': data.phone,
+            'postal-code': data['postal-code'],
+            'prefecture': data.prefecture,
+            'city': data.city,
+            'street': data.street,
+            'apartment': data.apartment
+        };
+        
+        // "users"コレクションに、認証のUIDをドキュメントIDとしてデータを保存
+        await setDoc(doc(db, "users", user.uid), userData);
+
+        // 登録成功を通知
+        showNotification('登録が完了しました！');
+
+        // 成功メッセージを表示
+        signupForm.classList.add('hidden');
+        successMessageEl.classList.remove('hidden');
+        lucide.createIcons(); // 成功アイコンを再描画
+
+    } catch (error) {
+        console.error("登録エラー:", error.code, error.message);
+        if (error.code === 'auth/email-already-in-use') {
+            showNotification('このメールアドレスは既に使用されています。');
+        } else if (error.code === 'auth/weak-password') {
+            showNotification('パスワードは6文字以上で設定してください。');
+        } else {
+            showNotification('登録に失敗しました。');
+        }
+    }
 }
+
 
 // --- イベントリスナーの設定 ---
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 都道府県プルダウンを初期化
     populatePrefectures();
-
-    // 住所検索ボタンにクリックイベントを設定
     searchAddressButton.addEventListener('click', handleSearchAddress);
-
-    // 登録フォームに送信イベントを設定
     signupForm.addEventListener('submit', handleSignupSubmit);
 });
+

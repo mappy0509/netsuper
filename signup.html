@@ -4,129 +4,123 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>新規会員登録 - NetSuper</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Common Stylesheet -->
     <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="bg-stone-50 font-sans">
-
-    <!-- Header -->
-    <header class="bg-emerald-800 text-white shadow-md">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
-            <a href="index.html" class="text-2xl font-bold text-white">NetSuper</a>
-            <div>
-                <a href="index.html" class="text-sm hover:underline">ストアに戻る</a>
+<body class="bg-stone-50">
+    <div class="container mx-auto px-4 py-8 sm:py-12">
+        <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
+            <div class="text-center mb-8">
+                <a href="index.html" class="text-3xl font-bold text-emerald-800">NetSuper</a>
+                <h1 class="text-2xl font-bold text-slate-800 mt-4">新規会員登録</h1>
+                <p class="text-gray-600 mt-2">必要な情報をご入力ください。</p>
             </div>
-        </div>
-    </header>
-
-    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow border">
-            <h1 class="text-2xl sm:text-3xl font-bold text-center text-slate-800 mb-8">新規会員登録</h1>
 
             <form id="signup-form" class="space-y-6">
-                <!-- Name -->
+                <!-- お名前 -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label for="last-name" class="block text-sm font-medium text-gray-700">お名前（姓）</label>
-                        <input type="text" id="last-name" name="last-name" autocomplete="family-name" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
+                        <label for="last-name" class="block text-sm font-medium text-gray-700">お名前（姓）<span class="text-red-500">*</span></label>
+                        <input type="text" id="last-name" name="last-name" required autocomplete="family-name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
                     </div>
                     <div>
-                        <label for="first-name" class="block text-sm font-medium text-gray-700">お名前（名）</label>
-                        <input type="text" id="first-name" name="first-name" autocomplete="given-name" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
+                        <label for="first-name" class="block text-sm font-medium text-gray-700">お名前（名）<span class="text-red-500">*</span></label>
+                        <input type="text" id="first-name" name="first-name" required autocomplete="given-name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
                     </div>
                 </div>
 
-                <!-- Furigana -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label for="last-name-kana" class="block text-sm font-medium text-gray-700">フリガナ（セイ）</label>
-                        <input type="text" id="last-name-kana" name="last-name-kana" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
-                    </div>
-                    <div>
-                        <label for="first-name-kana" class="block text-sm font-medium text-gray-700">フリガナ（メイ）</label>
-                        <input type="text" id="first-name-kana" name="first-name-kana" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
-                    </div>
-                </div>
-
-                <!-- Email -->
+                <!-- メールアドレス -->
                 <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700">メールアドレス</label>
-                    <input type="email" id="email" name="email" autocomplete="email" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
-                </div>
-
-                <!-- Password -->
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700">パスワード</label>
-                    <input type="password" id="password" name="password" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
+                    <label for="email" class="block text-sm font-medium text-gray-700">メールアドレス<span class="text-red-500">*</span></label>
+                    <input type="email" id="email" name="email" required autocomplete="email" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
                 </div>
                 
-                <!-- Phone -->
+                <!-- パスワード -->
                 <div>
-                    <label for="tel" class="block text-sm font-medium text-gray-700">電話番号</label>
-                    <input type="tel" id="tel" name="tel" autocomplete="tel" required placeholder="ハイフンなしで入力" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
+                    <label for="password" class="block text-sm font-medium text-gray-700">パスワード<span class="text-red-500">*</span></label>
+                    <input type="password" id="password" name="password" required autocomplete="new-password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
                 </div>
 
-                <!-- Address -->
-                <div class="space-y-4 pt-4 border-t">
-                     <h2 class="text-lg font-semibold">ご住所（発送先）</h2>
-                     <!-- Postal Code -->
-                     <div>
+                <!-- パスワード（確認用） -->
+                <div>
+                    <label for="password-confirm" class="block text-sm font-medium text-gray-700">パスワード（確認用）<span class="text-red-500">*</span></label>
+                    <input type="password" id="password-confirm" name="password-confirm" required autocomplete="new-password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
+                </div>
+
+                <!-- 電話番号 -->
+                <div>
+                    <label for="phone" class="block text-sm font-medium text-gray-700">電話番号<span class="text-red-500">*</span></label>
+                    <input type="tel" id="phone" name="phone" autocomplete="tel" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
+                </div>
+
+                <hr class="my-6">
+
+                <h2 class="text-lg font-semibold text-slate-800">ご住所（発送先）</h2>
+                
+                <!-- 郵便番号 -->
+                <div class="flex items-end space-x-4">
+                    <div class="flex-grow">
                         <label for="postal-code" class="block text-sm font-medium text-gray-700">郵便番号</label>
-                        <div class="flex items-center">
-                            <input type="text" id="postal-code" name="postal-code" autocomplete="postal-code" required placeholder="例: 1000001" class="mt-1 block w-40 border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
-                            <button type="button" id="search-address-button" class="ml-4 bg-gray-200 hover:bg-gray-300 text-slate-800 font-semibold py-2 px-4 rounded-lg text-sm">住所を検索</button>
-                        </div>
+                        <input type="text" id="postal-code" name="postal-code" autocomplete="postal-code" placeholder="例: 1000001" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
                     </div>
-                    <!-- Prefecture -->
-                    <div>
-                        <label for="prefecture" class="block text-sm font-medium text-gray-700">都道府県</label>
-                        <select id="prefecture" name="prefecture" autocomplete="address-level1" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
-                            <option value="">選択してください</option>
-                            <!-- Options will be added by JS -->
-                        </select>
-                    </div>
-                    <!-- City -->
-                    <div>
-                        <label for="city" class="block text-sm font-medium text-gray-700">市区町村</label>
-                        <input type="text" id="city" name="city" autocomplete="address-level2" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
-                    </div>
-                    <!-- Street Address -->
-                    <div>
-                        <label for="street-address" class="block text-sm font-medium text-gray-700">番地</label>
-                        <input type="text" id="street-address" name="street-address" autocomplete="street-address" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
-                    </div>
-                    <!-- Building, Apartment, etc. -->
-                    <div>
-                        <label for="building" class="block text-sm font-medium text-gray-700">建物名・部屋番号など</label>
-                        <input type="text" id="building" name="building" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
-                    </div>
+                    <button type="button" id="search-address-button" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 text-sm">住所検索</button>
+                </div>
+
+                <!-- 都道府県 -->
+                <div>
+                    <label for="prefecture" class="block text-sm font-medium text-gray-700">都道府県</label>
+                    <select id="prefecture" name="prefecture" autocomplete="address-level1" class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
+                        <option value="">選択してください</option>
+                    </select>
+                </div>
+
+                <!-- 市区町村 -->
+                <div>
+                    <label for="city" class="block text-sm font-medium text-gray-700">市区町村</label>
+                    <input type="text" id="city" name="city" autocomplete="address-level2" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
+                </div>
+
+                <!-- 番地 -->
+                <div>
+                    <label for="street" class="block text-sm font-medium text-gray-700">番地</label>
+                    <input type="text" id="street" name="street" autocomplete="street-address" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
                 </div>
                 
-                <!-- Submit Button -->
-                <div class="pt-6">
-                    <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-colors text-lg">
+                <!-- 建物名・部屋番号 -->
+                <div>
+                    <label for="apartment" class="block text-sm font-medium text-gray-700">建物名・部屋番号など</label>
+                    <input type="text" id="apartment" name="apartment" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
+                </div>
+
+                <!-- 登録ボタン -->
+                <div class="pt-4">
+                    <button type="submit" class="w-full bg-emerald-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-emerald-700 transition">
                         登録する
                     </button>
                 </div>
             </form>
+            
+            <div id="success-message" class="hidden text-center mt-8">
+                <i data-lucide="check-circle" class="text-emerald-500 w-16 h-16 mx-auto"></i>
+                <h2 class="text-2xl font-bold text-slate-800 mt-4">ご登録ありがとうございます！</h2>
+                <p class="text-gray-600 mt-2">アカウントの作成が完了しました。</p>
+                <a href="index.html" class="mt-6 inline-block bg-emerald-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-emerald-700 transition">
+                    お買い物を続ける
+                </a>
+            </div>
         </div>
-    </main>
+    </div>
 
-    <!-- Notification Area -->
-    <div id="notification" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-lg shadow-lg" style="display: none;"></div>
+    <!-- 通知表示用の要素 -->
+    <div id="notification" class="hidden fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-lg shadow-lg"></div>
 
-    <!-- Common Scripts -->
-    <script src="shared.js"></script>
-    <!-- Page Specific Script (to be created) -->
-    <!-- <script src="signup.js"></script> -->
     <script>
-        // Initialize Lucide Icons
         lucide.createIcons();
     </script>
+    <script src="firebase-config.js" type="module"></script>
+    <script src="shared.js" type="module"></script>
+    <script src="signup.js" type="module"></script>
 </body>
 </html>
 

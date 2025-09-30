@@ -3,32 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NetSuper</title>
-    <!-- Tailwind CSSを読み込みます -->
+    <title>NetSuper - 新鮮な食材をお届け</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Iconsを読み込みます -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- 共通のスタイルシートを読み込みます -->
     <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="bg-stone-50 font-sans">
-    <div id="app-container">
-        <!-- ヘッダーはJSによってここに描画されます -->
-        <header id="header-container"></header>
 
-        <!-- デモ操作エリアはJSによってここに描画されます -->
-        <div id="demo-controls"></div>
-
-        <!-- メインコンテンツはJSによってここに描画されます -->
-        <main id="main-container" class="container mx-auto px-4 sm:px-6 lg:px-8 py-8"></main>
-
-        <!-- 通知エリア -->
-        <div id="notification" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-lg shadow-lg" style="display: none;"></div>
-    </div>
+    <!-- ヘッダー (JSで動的に生成) -->
+    <div id="header-container"></div>
     
-    <!-- 共通スクリプトを先に読み込みます -->
-    <script src="shared.js"></script>
-    <!-- このページ専用のスクリプトを読み込みます -->
-    <script src="customer.js"></script>
+    <!-- メインコンテンツ (JSで動的に生成) -->
+    <main id="main-container" class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- 商品一覧などがここに表示されます -->
+    </main>
+
+    <!-- ログインモーダル -->
+    <div id="login-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
+            <h2 class="text-2xl font-bold text-center mb-6">ログイン</h2>
+            <form id="login-form">
+                <div class="mb-4">
+                    <label for="login-email" class="block text-sm font-medium text-gray-700">メールアドレス</label>
+                    <input type="email" id="login-email" name="email" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
+                </div>
+                <div class="mb-6">
+                    <label for="login-password" class="block text-sm font-medium text-gray-700">パスワード</label>
+                    <input type="password" id="login-password" name="password" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
+                </div>
+                <div class="flex items-center justify-between">
+                    <button type="button" id="login-modal-close-button" class="text-gray-600">キャンセル</button>
+                    <button type="submit" class="bg-emerald-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-emerald-700 transition">ログイン</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- 通知表示用の要素 -->
+    <div id="notification" class="hidden fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-lg shadow-lg"></div>
+
+    <script>
+        // Lucide Iconsを初期化
+        lucide.createIcons();
+    </script>
+    
+    <!-- JSファイルをモジュールとして読み込む -->
+    <script src="firebase-config.js" type="module"></script>
+    <script src="shared.js" type="module"></script>
+    <script src="customer.js" type="module"></script>
+
 </body>
 </html>
+

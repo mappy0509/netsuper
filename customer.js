@@ -1,11 +1,19 @@
+// Firebase関連のモジュールと共通関数をインポート
+import { auth, db } from './firebase-config.js';
+import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+import { products, showNotification } from './shared.js';
+
+
 // --- グローバル変数と状態管理 ---
-let user = null; // nullは非ログイン状態
+let user = null; // ログインしているユーザーの情報を格納
 let cart = [];
 
 // --- DOM要素の取得 ---
 const headerEl = document.getElementById('header-container');
-const demoControlsEl = document.getElementById('demo-controls');
 const mainEl = document.getElementById('main-container');
+const loginModalEl = document.getElementById('login-modal');
+const loginForm = document.getElementById('login-form');
 
 // --- レンダリング（描画）関数 ---
 
@@ -28,7 +36,11 @@ function renderHeader() {
                     ${user
                         ? ` <div class="flex items-center space-x-2">
                                 <i data-lucide="user"></i>
-                                <span class="hidden md:inline">${user.name} 様</span>
+                                <span class="hidden md:inline">${user.firstName || 'ゲスト'} 様</span>
+                                <button class="logout-button flex items-center hover:bg-emerald-700 p-2 rounded">
+                                     <i data-lucide="log-out" class="w-5 h-5 mr-1"></i>
+                                    <span class="hidden md:inline">ログアウト</span>
+                                </button>
                             </div>`
                         : ` <div class="flex items-center space-x-2">
                                 <a href="signup.html" class="flex items-center hover:bg-emerald-700 p-2 rounded">
@@ -52,16 +64,6 @@ function renderHeader() {
     `;
 }
 
-/** デモ操作ボタンを描画します */
-function renderDemoControls() {
-    demoControlsEl.innerHTML = `
-        <div class="bg-slate-700 p-2 text-center text-sm text-white">
-            <span class="font-bold mb-1 mr-4">【デモ操作】</span>
-            <button class="demo-login bg-sky-500 hover:bg-sky-600 px-2 py-1 rounded-md text-xs mx-1">ログイン</button>
-            <button class="demo-logout bg-gray-500 hover:bg-gray-600 px-2 py-1 rounded-md text-xs mx-1">ログアウト</button>
-        </div>
-    `;
-}
 
 /** メインコンテンツを描画します */
 function renderMainContent() {
@@ -122,27 +124,49 @@ function renderMainContent() {
 /** UI全体を更新します */
 function updateUI() {
     renderHeader();
-    renderDemoControls();
     renderMainContent();
     lucide.createIcons(); // アイコンを再描画
 }
 
-// --- イベントハンドラとロジック ---
-
-/** ログインをシミュレートします */
-function simulateLogin() {
-    user = { name: 'テストユーザー' };
-    showNotification('ようこそ！ログインしました。');
-    updateUI();
-};
-
-/** ログアウトをシミュレートします */
-function simulateLogout() {
-    user = null;
-    cart = []; // ログアウト時にカートを空にする
-    showNotification('ログアウトしました。');
-    updateUI();
+// --- モーダル制御 ---
+function showLoginModal() {
+    loginModalEl.classList.remove('hidden');
 }
+function hideLoginModal() {
+    loginModalEl.classList.add('hidden');
+}
+
+// --- Firebase 認証 ---
+
+/** ログインフォームが送信されたときの処理 */
+async function handleLoginSubmit(event) {
+    event.preventDefault();
+    const email = loginForm.email.value;
+    const password = loginForm.password.value;
+
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
+        hideLoginModal();
+        showNotification('ログインしました。');
+        // UIの更新は onAuthStateChanged が自動的に行う
+    } catch (error) {
+        console.error("ログインエラー:", error.code);
+        showNotification('メールアドレスまたはパスワードが正しくありません。');
+    }
+}
+
+/** ログアウト処理 */
+async function handleLogout() {
+    try {
+        await signOut(auth);
+        showNotification('ログアウトしました。');
+        // UIの更新は onAuthStateChanged が自動的に行う
+    } catch (error) {
+        console.error("ログアウトエラー:", error);
+        showNotification('ログアウトに失敗しました。');
+    }
+}
+
 
 /** カートに商品を追加します */
 function handleAddToCart(productId) {
@@ -161,21 +185,51 @@ function handleAddToCart(productId) {
 
 // --- イベントリスナーの設定 ---
 document.addEventListener('DOMContentLoaded', () => {
+
+    // Firebaseの認証状態の変化を監視
+    onAuthStateChanged(auth, async (firebaseUser) => {
+        if (firebaseUser) {
+            // ユーザーがログインしている場合
+            // Firestoreからユーザーの追加情報を取得
+            const userDocRef = doc(db, "users", firebaseUser.uid);
+            const userDocSnap = await getDoc(userDocRef);
+            if (userDocSnap.exists()) {
+                const userData = userDocSnap.data();
+                user = {
+                    uid: firebaseUser.uid,
+                    email: firebaseUser.email,
+                    firstName: userData['first-name'], // Firestoreから名を取得
+                    lastName: userData['last-name'], // Firestoreから姓を取得
+                };
+            } else {
+                // Firestoreにドキュメントがない場合(通常はありえない)
+                user = { uid: firebaseUser.uid, email: firebaseUser.email };
+            }
+        } else {
+            // ユーザーがログアウトしている場合
+            user = null;
+            cart = []; // ログアウト時にカートを空にする
+        }
+        updateUI(); // 認証状態が変わるたびにUIを更新
+    });
+
+    // ログインフォームの送信イベント
+    loginForm.addEventListener('submit', handleLoginSubmit);
+    
     // イベント委任を使用して、動的に生成される要素のクリックを処理
     document.body.addEventListener('click', (event) => {
         const target = event.target.closest('button');
         if (!target) return;
-
-        // デモ操作
-        if (target.matches('.demo-login')) simulateLogin();
-        if (target.matches('.demo-logout')) simulateLogout();
         
-        // ログイン
-        if (target.matches('.login-button')) simulateLogin();
+        // ログイン・ログアウト
+        if (target.matches('.login-button')) showLoginModal();
+        if (target.matches('.logout-button')) handleLogout();
+        if (target.matches('#login-modal-close-button')) hideLoginModal();
+
         
         // カートに追加
         if (target.matches('.add-to-cart-button')) {
-            const productId = parseInt(target.dataset.productId);
+            const productId = event.target.closest('button').dataset.productId;
             handleAddToCart(productId);
         }
 
@@ -184,8 +238,5 @@ document.addEventListener('DOMContentLoaded', () => {
             showNotification('カートページは現在準備中です。');
         }
     });
-
-    // 初期表示
-    updateUI();
 });
 
