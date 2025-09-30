@@ -1,4 +1,4 @@
-// --- このページで使うグローバル変数 ---
+// --- グローバル変数と状態管理 ---
 let user = null; // nullは非ログイン状態
 let cart = [];
 
@@ -31,7 +31,7 @@ function renderHeader() {
                                 <span class="hidden md:inline">${user.name} 様</span>
                             </div>`
                         : ` <div class="flex items-center space-x-2">
-                                <a href="signup.html" class="signup-button flex items-center hover:bg-emerald-700 p-2 rounded">
+                                <a href="signup.html" class="flex items-center hover:bg-emerald-700 p-2 rounded">
                                     <i data-lucide="user-plus" class="w-5 h-5 mr-1"></i>
                                     <span class="hidden md:inline">新規登録</span>
                                 </a>
@@ -46,13 +46,6 @@ function renderHeader() {
                         <span class="hidden md:inline ml-1">カート</span>
                         ${cartItemCount > 0 ? `<span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">${cartItemCount}</span>` : ''}
                     </button>
-                </div>
-            </div>
-            <div class="bg-emerald-700 text-white">
-                <div class="container mx-auto px-4 flex items-center space-x-4 h-10 text-sm font-semibold">
-                    <button class="flex items-center"><i data-lucide="menu" class="w-5 h-5 mr-1"></i>すべて</button>
-                    <a href="#" class="hover:underline">野菜セット</a>
-                    <a href="#" class="hover:underline">お米</a>
                 </div>
             </div>
         </header>
@@ -73,7 +66,7 @@ function renderDemoControls() {
 /** メインコンテンツを描画します */
 function renderMainContent() {
     const productGridHTML = `
-        <h2 class="text-2xl font-bold text-slate-800 mb-6">おすすめ商品</h2>
+        <h2 class="text-2xl font-bold text-slate-800 mb-6">商品ラインナップ</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             ${products.map(product => `
                 <div class="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col h-full border border-gray-200 hover:shadow-lg transition-shadow duration-300">
@@ -82,13 +75,24 @@ function renderMainContent() {
                     </div>
                     <div class="p-4 flex flex-col flex-grow">
                         <h3 class="text-base text-slate-800 font-semibold mb-2 flex-grow hover:text-emerald-600 cursor-pointer">${product.name}</h3>
-                        <div class="flex items-center mb-2">
-                            <div class="flex text-amber-500">${'★'.repeat(Math.round(product.rating))}${'☆'.repeat(5 - Math.round(product.rating))}</div>
-                            <span class="text-sm text-emerald-600 ml-2 hover:underline cursor-pointer">${product.reviews}</span>
-                        </div>
-                        <div class="mb-4">
+                        <p class="text-sm text-gray-600 mt-1 mb-2">${product.description}</p>
+                        
+                        ${product.isReservation ? `
+                            <div class="my-2 p-2 bg-sky-50 border border-sky-200 rounded-md">
+                                <span class="text-xs font-bold bg-sky-500 text-white px-2 py-1 rounded-full">予約販売</span>
+                                <p class="text-sm text-sky-800 font-semibold mt-1">${product.reservationNote}</p>
+                            </div>` : ''}
+                        
+                        ${product.shippingInfo ? `
+                            <div class="mt-2 text-xs text-gray-500">
+                                <p><strong>送料(税込):</strong> ${product.shippingInfo}</p>
+                            </div>` : ''}
+
+                        <div class="mt-4 mb-4">
                             <span class="text-2xl font-bold text-slate-800">¥${product.price.toLocaleString()}</span>
+                            <span class="text-sm text-gray-500"> (税込)</span>
                         </div>
+
                         <button data-product-id="${product.id}" class="add-to-cart-button mt-auto w-full bg-amber-500 border border-amber-500 hover:bg-amber-600 text-white font-semibold py-2 rounded-lg shadow-sm transition-colors">カートに入れる</button>
                     </div>
                 </div>
@@ -100,14 +104,12 @@ function renderMainContent() {
         mainEl.innerHTML = `
             <div class="bg-white p-6 rounded-lg mb-8 shadow-sm text-center border">
                 <h2 class="text-2xl font-bold mb-2">ログイン・新規登録</h2>
-                <p class="text-gray-600 mb-4">ご登録いただくと、次回からお客様情報の入力が不要になります。</p>
-                <div class="flex justify-center space-x-4">
+                <p class="text-gray-600 mb-4">アカウントをお持ちでない方もご購入いただけます。</p>
+                <div class="flex justify-center items-center space-x-4">
                     <button class="login-button bg-amber-500 border border-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-10 rounded-lg shadow-sm transition-colors">
                         ログイン
                     </button>
-                    <a href="signup.html" class="signup-button bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-10 rounded-lg shadow-sm transition-colors inline-block">
-                        新規登録
-                    </a>
+                    <a href="signup.html" class="text-emerald-600 hover:underline font-semibold">新規登録はこちら</a>
                 </div>
             </div>
             ${productGridHTML}
@@ -130,50 +132,60 @@ function updateUI() {
 /** ログインをシミュレートします */
 function simulateLogin() {
     user = { name: 'テストユーザー' };
-    showNotification('ようこそ！ログインしました。'); // shared.jsの関数を呼び出し
+    showNotification('ようこそ！ログインしました。');
     updateUI();
 };
 
 /** ログアウトをシミュレートします */
 function simulateLogout() {
     user = null;
-    cart = [];
-    showNotification('ログアウトしました。'); // shared.jsの関数を呼び出し
+    cart = []; // ログアウト時にカートを空にする
+    showNotification('ログアウトしました。');
     updateUI();
 }
 
 /** カートに商品を追加します */
 function handleAddToCart(productId) {
-    const product = products.find(p => p.id === parseInt(productId));
+    const product = products.find(p => p.id === productId);
     if (!product) return;
 
-    const existingItem = cart.find(item => item.id === parseInt(productId));
+    const existingItem = cart.find(item => item.id === productId);
     if (existingItem) {
         existingItem.quantity++;
     } else {
         cart.push({ ...product, quantity: 1 });
     }
-    showNotification(`${product.name}をカートに追加しました。`); // shared.jsの関数を呼び出し
+    showNotification(`${product.name}をカートに追加しました。`);
     updateUI();
 }
 
 // --- イベントリスナーの設定 ---
 document.addEventListener('DOMContentLoaded', () => {
+    // イベント委任を使用して、動的に生成される要素のクリックを処理
     document.body.addEventListener('click', (event) => {
-        const button = event.target.closest('button');
-        if (!button) return;
+        const target = event.target.closest('button');
+        if (!target) return;
 
-        if (button.matches('.demo-login')) simulateLogin();
-        if (button.matches('.demo-logout')) simulateLogout();
-        if (button.matches('.login-button')) simulateLogin();
-        if (button.matches('.add-to-cart-button')) {
-            handleAddToCart(button.dataset.productId);
+        // デモ操作
+        if (target.matches('.demo-login')) simulateLogin();
+        if (target.matches('.demo-logout')) simulateLogout();
+        
+        // ログイン
+        if (target.matches('.login-button')) simulateLogin();
+        
+        // カートに追加
+        if (target.matches('.add-to-cart-button')) {
+            const productId = parseInt(target.dataset.productId);
+            handleAddToCart(productId);
         }
-        if (button.matches('.cart-button')) {
+
+        // カートボタン（今回はダミー）
+        if (target.matches('.cart-button')) {
             showNotification('カートページは現在準備中です。');
         }
     });
 
-    updateUI(); // 初期表示
+    // 初期表示
+    updateUI();
 });
 
