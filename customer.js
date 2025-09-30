@@ -1,7 +1,7 @@
 // Firebase関連のモジュールと共通関数をインポート
 import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 import { products, showNotification } from './shared.js';
 
 
@@ -14,6 +14,11 @@ const headerEl = document.getElementById('header-container');
 const mainEl = document.getElementById('main-container');
 const loginModalEl = document.getElementById('login-modal');
 const loginForm = document.getElementById('login-form');
+const cartModalEl = document.getElementById('cart-modal');
+const cartItemsContainerEl = document.getElementById('cart-items-container');
+const cartTotalContainerEl = document.getElementById('cart-total-container');
+const checkoutButton = document.getElementById('checkout-button');
+
 
 // --- レンダリング（描画）関数 ---
 
@@ -121,6 +126,45 @@ function renderMainContent() {
     }
 }
 
+/** カートモーダルの中身を描画します */
+function renderCart() {
+    if (cart.length === 0) {
+        cartItemsContainerEl.innerHTML = `<p class="text-gray-500 text-center py-8">カートは空です。</p>`;
+        cartTotalContainerEl.innerHTML = '';
+        checkoutButton.disabled = true;
+    } else {
+        cartItemsContainerEl.innerHTML = cart.map(item => `
+            <div class="flex items-center space-x-4 border-b py-4">
+                <img src="${item.imageUrl}" alt="${item.name}" class="w-20 h-20 object-cover rounded-md">
+                <div class="flex-grow">
+                    <p class="font-semibold text-slate-800">${item.name}</p>
+                    <p class="text-sm text-gray-600">¥${item.price.toLocaleString()}</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button data-product-id="${item.id}" data-change="-1" class="update-quantity-button bg-gray-200 rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-300">-</button>
+                    <span>${item.quantity}</span>
+                    <button data-product-id="${item.id}" data-change="1" class="update-quantity-button bg-gray-200 rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-300">+</button>
+                </div>
+                <div class="text-right w-24">
+                    <p class="font-bold text-slate-800">¥${(item.price * item.quantity).toLocaleString()}</p>
+                </div>
+                <button data-product-id="${item.id}" class="remove-from-cart-button text-gray-400 hover:text-red-500">
+                    <i data-lucide="trash-2" class="w-5 h-5"></i>
+                </button>
+            </div>
+        `).join('');
+
+        const totalPrice = cart.reduce((total, item) => total + item.price * item.quantity, 0);
+        cartTotalContainerEl.innerHTML = `
+            <p class="text-lg">小計: <span class="font-bold text-2xl text-slate-800">¥${totalPrice.toLocaleString()}</span> (税込)</p>
+        `;
+        checkoutButton.disabled = false;
+    }
+    // カートモーダル内の描画では、ヘッダーのみ更新する
+    renderHeader();
+    lucide.createIcons();
+}
+
 /** UI全体を更新します */
 function updateUI() {
     renderHeader();
@@ -135,6 +179,14 @@ function showLoginModal() {
 function hideLoginModal() {
     loginModalEl.classList.add('hidden');
 }
+function showCartModal() {
+    renderCart();
+    cartModalEl.classList.remove('hidden');
+}
+function hideCartModal() {
+    cartModalEl.classList.add('hidden');
+}
+
 
 // --- Firebase 認証 ---
 
@@ -148,7 +200,6 @@ async function handleLoginSubmit(event) {
         await signInWithEmailAndPassword(auth, email, password);
         hideLoginModal();
         showNotification('ログインしました。');
-        // UIの更新は onAuthStateChanged が自動的に行う
     } catch (error) {
         console.error("ログインエラー:", error.code);
         showNotification('メールアドレスまたはパスワードが正しくありません。');
@@ -160,13 +211,26 @@ async function handleLogout() {
     try {
         await signOut(auth);
         showNotification('ログアウトしました。');
-        // UIの更新は onAuthStateChanged が自動的に行う
     } catch (error) {
         console.error("ログアウトエラー:", error);
         showNotification('ログアウトに失敗しました。');
     }
 }
 
+// --- カート操作 ---
+
+/** ユーザーのカート情報をFirestoreに保存します */
+async function saveCartToFirestore() {
+    if (!user) return; // ログインしていない場合は何もしない
+    try {
+        const userDocRef = doc(db, "users", user.uid);
+        // { merge: true } を使うことで、他のユーザー情報を上書きせず cart フィールドのみを更新
+        await setDoc(userDocRef, { cart: cart }, { merge: true });
+    } catch (error) {
+        console.error("カートの保存に失敗しました:", error);
+        showNotification('カートの更新に失敗しました。');
+    }
+}
 
 /** カートに商品を追加します */
 function handleAddToCart(productId) {
@@ -180,31 +244,91 @@ function handleAddToCart(productId) {
         cart.push({ ...product, quantity: 1 });
     }
     showNotification(`${product.name}をカートに追加しました。`);
-    updateUI();
+    updateUI(); // ヘッダーのカートアイコンを更新
+    saveCartToFirestore();
 }
+
+/** カートから商品を削除します */
+function handleRemoveFromCart(productId) {
+    cart = cart.filter(item => item.id !== productId);
+    showNotification('商品をカートから削除しました。');
+    renderCart();
+    saveCartToFirestore();
+}
+
+/** カート商品の数量を変更します */
+function handleUpdateQuantity(productId, change) {
+    const item = cart.find(i => i.id === productId);
+    if (item) {
+        item.quantity += change;
+        if (item.quantity <= 0) {
+            handleRemoveFromCart(productId);
+        } else {
+            renderCart();
+            saveCartToFirestore();
+        }
+    }
+}
+
+/**
+ * 2つのカート配列をマージ（統合）します。
+ * @param {Array} guestCart - ゲスト時のカート
+ * @param {Array} userCart - Firestoreから読み込んだユーザーのカート
+ * @returns {Array} マージされた新しいカート配列
+ */
+function mergeCarts(guestCart, userCart) {
+    const mergedCart = [...userCart];
+
+    guestCart.forEach(guestItem => {
+        const existingItem = mergedCart.find(userItem => userItem.id === guestItem.id);
+        if (existingItem) {
+            // 同じ商品があれば数量を合計
+            existingItem.quantity += guestItem.quantity;
+        } else {
+            // なければ商品を追加
+            mergedCart.push(guestItem);
+        }
+    });
+
+    return mergedCart;
+}
+
 
 // --- イベントリスナーの設定 ---
 document.addEventListener('DOMContentLoaded', () => {
 
     // Firebaseの認証状態の変化を監視
     onAuthStateChanged(auth, async (firebaseUser) => {
+        const guestCart = [...cart]; // ログイン処理の直前のカート内容（ゲストカート）を保持
+
         if (firebaseUser) {
-            // ユーザーがログインしている場合
-            // Firestoreからユーザーの追加情報を取得
             const userDocRef = doc(db, "users", firebaseUser.uid);
             const userDocSnap = await getDoc(userDocRef);
+            let firestoreCart = [];
+
             if (userDocSnap.exists()) {
                 const userData = userDocSnap.data();
                 user = {
                     uid: firebaseUser.uid,
                     email: firebaseUser.email,
-                    firstName: userData['first-name'], // Firestoreから名を取得
-                    lastName: userData['last-name'], // Firestoreから姓を取得
+                    firstName: userData['first-name'],
+                    lastName: userData['last-name'],
                 };
+                firestoreCart = userData.cart || [];
             } else {
-                // Firestoreにドキュメントがない場合(通常はありえない)
                 user = { uid: firebaseUser.uid, email: firebaseUser.email };
             }
+
+            // ゲスト時のカートに商品が入っていれば、Firestoreのカートと統合
+            if (guestCart.length > 0) {
+                cart = mergeCarts(guestCart, firestoreCart);
+                await saveCartToFirestore(); // 統合したカートをすぐに保存
+                showNotification('カートを統合しました。');
+            } else {
+                // ゲストカートが空なら、Firestoreのカートをそのまま使う
+                cart = firestoreCart;
+            }
+
         } else {
             // ユーザーがログアウトしている場合
             user = null;
@@ -218,24 +342,33 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // イベント委任を使用して、動的に生成される要素のクリックを処理
     document.body.addEventListener('click', (event) => {
-        const target = event.target.closest('button');
-        if (!target) return;
+        const button = event.target.closest('button');
+        if (!button) return;
         
-        // ログイン・ログアウト
-        if (target.matches('.login-button')) showLoginModal();
-        if (target.matches('.logout-button')) handleLogout();
-        if (target.matches('#login-modal-close-button')) hideLoginModal();
+        // --- ログイン・ログアウト関連 ---
+        if (button.matches('.login-button')) showLoginModal();
+        if (button.matches('.logout-button')) handleLogout();
+        if (button.matches('#login-modal-close-button')) hideLoginModal();
 
-        
-        // カートに追加
-        if (target.matches('.add-to-cart-button')) {
-            const productId = event.target.closest('button').dataset.productId;
-            handleAddToCart(productId);
+        // --- カート関連 ---
+        if (button.matches('.add-to-cart-button')) {
+            handleAddToCart(button.dataset.productId);
         }
-
-        // カートボタン（今回はダミー）
-        if (target.matches('.cart-button')) {
-            showNotification('カートページは現在準備中です。');
+        if (button.matches('.cart-button')) {
+            showCartModal();
+        }
+        if (button.matches('#cart-modal-close-button')) {
+            hideCartModal();
+        }
+        if (button.matches('.remove-from-cart-button')) {
+            handleRemoveFromCart(button.dataset.productId);
+        }
+        if (button.matches('.update-quantity-button')) {
+            const change = parseInt(button.dataset.change, 10);
+            handleUpdateQuantity(button.dataset.productId, change);
+        }
+        if (button.matches('#checkout-button')) {
+            showNotification('決済ページは現在準備中です。');
         }
     });
 });
