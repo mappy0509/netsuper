@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>お支払い - NetSuper</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Stripe.jsを読み込みます -->
     <script src="https://js.stripe.com/v3/"></script>
 </head>
 <body class="bg-stone-50">
@@ -16,44 +15,55 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- 左側: 注文概要 -->
             <div class="bg-white p-6 rounded-lg shadow-md border order-2 md:order-1">
                 <h2 class="text-lg font-semibold mb-4 border-b pb-2">ご注文内容</h2>
                 <div id="order-summary" class="space-y-4 mb-4">
-                    <!-- カートの中身はJSでここに描画されます -->
-                </div>
-                <div id="order-total" class="font-bold text-lg text-slate-800 border-t pt-4">
-                    <!-- 合計金額はJSでここに描画されます -->
+                    </div>
+                
+                <div class="border-t pt-4 space-y-2 text-slate-800">
+                    <div class="flex justify-between text-sm">
+                        <span>小計</span>
+                        <span id="order-subtotal">¥0</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span>送料</span>
+                        <span id="order-shipping-fee">---</span>
+                    </div>
+                    <div class="flex justify-between font-bold text-lg border-t pt-2 mt-2">
+                        <span>ご請求額</span>
+                        <span id="order-total">¥0</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- 右側: 決済フォーム -->
             <div class="bg-white p-6 rounded-lg shadow-md border order-1 md:order-2">
                 <h2 class="text-lg font-semibold mb-4">お支払い情報</h2>
                 <form id="payment-form">
-                    <!-- メールアドレス入力欄 -->
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700">メールアドレス</label>
                         <input type="email" id="email" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 bg-gray-50" readonly>
                     </div>
 
-                    <!-- Stripeの決済フォームが埋め込まれる場所 -->
+                    <div class="mt-4">
+                        <label for="prefecture-select" class="block text-sm font-medium text-gray-700">配送先の都道府県</label>
+                        <select id="prefecture-select" required class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
+                            <option value="">都道府県を選択してください</option>
+                            </select>
+                    </div>
+
                     <div id="payment-element" class="my-5"></div>
 
-                    <!-- 支払いボタン -->
                     <button id="submit-button" class="w-full bg-emerald-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-emerald-700 transition disabled:bg-gray-400">
                         <span id="button-text">支払いを確定する</span>
                     </button>
                     
-                    <!-- エラーメッセージ表示エリア -->
                     <div id="payment-message" class="hidden text-red-500 text-sm mt-2 text-center"></div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- このページ専用のスクリプト -->
+    <script src="shipping.js" type="module"></script>
     <script src="checkout.js" type="module"></script>
 </body>
 </html>
-

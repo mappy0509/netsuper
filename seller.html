@@ -9,14 +9,12 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-stone-50 font-sans">
-    <div id="seller-app-container">
+    <div id="seller-app-container" class="hidden"> 
         <header class="bg-emerald-800 text-white shadow-md">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
                 <h1 class="text-xl font-bold">出品者管理画面</h1>
-                <div>
-                    <span class="mr-4">事業者A 様</span>
-                    <a href="index.html" class="text-sm hover:underline">ログアウト</a>
-                </div>
+                <div id="admin-user-info" class="flex items-center space-x-2">
+                    </div>
             </div>
         </header>
 
@@ -106,10 +104,22 @@
                     <label for="product-image-url" class="block text-sm font-medium text-gray-700">画像URL</label>
                     <input type="text" id="product-image-url" placeholder="https://example.com/image.jpg" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
                 </div>
-                <div>
-                    <label for="product-regular-price" class="block text-sm font-medium text-gray-700">販売価格 (円)</label>
-                    <input type="number" id="product-regular-price" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="product-price" class="block text-sm font-medium text-gray-700">販売価格 (円)</label>
+                        <input type="number" id="product-price" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
+                    </div>
+                    <div class="flex items-center pt-6">
+                         <input type="checkbox" id="product-is-reservation" class="h-4 w-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500">
+                        <label for="product-is-reservation" class="ml-2 block text-sm font-medium text-gray-700">予約販売</label>
+                    </div>
                 </div>
+                <div id="reservation-note-container" class="hidden">
+                    <label for="product-reservation-note" class="block text-sm font-medium text-gray-700">予約販売ノート (例: 11月下旬発送)</label>
+                    <input type="text" id="product-reservation-note" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
+                </div>
+
                 <div class="text-right pt-4">
                     <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-lg">保存する</button>
                 </div>
@@ -121,7 +131,7 @@
         <div class="bg-white rounded-lg p-8 max-w-lg w-full">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-xl font-bold">新規メルマガを作成</h3>
-                <button id="newsletter-modal-close-button" class="text-gray-400 hover:text-gray-600 text-3xl">&times;</button>
+                <button id="newsletter-modal-close-button" class="text-gray-400 hover:text-gray-600 text-3xl">&times;</V>
             </div>
             <form id="newsletter-form" class="space-y-4">
                 <div>
@@ -143,8 +153,13 @@
         </div>
     </div>
 
-    <div id="notification" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-lg shadow-lg" style="display: none;"></div>
+    <div id="notification" class="hidden fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-lg shadow-lg"></div>
 
-    <script src="seller.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+    <script src="firebase-config.js" type="module"></script>
+    <script src="shared.js" type="module"></script>
+    <script src="seller.js" type="module"></script>
 </body>
 </html>
