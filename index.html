@@ -3,56 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>農家のB品市場 - 新鮮な食材をお届け</title>
+    <title>{ShopName} | {PageTitle}</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="bg-stone-50 font-sans">
 
-    <div id="header-container"></div>
+    <header class="bg-emerald-800 text-white sticky top-0 z-50 shadow-md">
+        <div class="container mx-auto px-4 flex items-center justify-between h-16">
+            <div class="flex-shrink-0">
+                <a href="{ShopTopPath}" class="text-2xl font-bold text-white">農家のB品市場</a>
+            </div>
+            
+            <div class="hidden sm:flex flex-grow mx-4">
+                <form action="/search" method="get" class="w-full flex">
+                    <input type="text" name="q" placeholder="商品を探す" class="w-full px-4 py-2 rounded-l-md text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500" />
+                    <button type="submit" class="bg-amber-500 hover:bg-amber-600 px-4 rounded-r-md">
+                        <i data-lucide="search" class="text-white"></i>
+                    </button>
+                </form>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+                {block:IsLogin}
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="user"></i>
+                        <span class="hidden md:inline">会員様</span>
+                        <a href="/logout" class="flex items-center hover:bg-emerald-700 p-2 rounded">
+                             <i data-lucide="log-out" class="w-5 h-5 mr-1"></i>
+                            <span class="hidden md:inline">ログアウト</span>
+                        </a>
+                    </div>
+                {/block:IsLogin}
+                
+                {block:NotIsLogin}
+                     <div class="flex items-center space-x-2">
+                        <a href="/members/add" class="flex items-center hover:bg-emerald-700 p-2 rounded">
+                            <i data-lucide="user-plus" class="w-5 h-5 mr-1"></i>
+                            <span class="hidden md:inline">新規登録</span>
+                        </a>
+                        <a href="/login" class="flex items-center hover:bg-emerald-700 p-2 rounded">
+                            <i data-lucide="log-in" class="w-5 h-5 mr-1"></i>
+                            <span class="hidden md:inline">ログイン</span>
+                        </a>
+                    </div>
+                {/block:NotIsLogin}
+                
+                <a href="/cart" class="cart-button relative flex items-center hover:bg-emerald-700 p-2 rounded">
+                    <i data-lucide="shopping-cart" class="w-7 h-7"></i>
+                    <span class="hidden md:inline ml-1">カート</span>
+                    
+                    {block:CartItemCount}
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{CartItemCount}</span>
+                    {/block:CartItemCount}
+                </a>
+            </div>
+        </div>
+    </header>
     
     <main id="main-container" class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        </main>
+        <h2 class="text-2xl font-bold text-slate-800 mb-6">商品ラインナップ</h2>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            
+            {block:Items}
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col h-full border border-gray-200 hover:shadow-lg transition-shadow duration-300">
+                <div class="p-4 bg-gray-50 flex justify-center items-center">
+                    {block:ItemImageUrl}
+                        <img src="{ItemImageUrl}" alt="{ItemName}" class="h-40 object-cover" />
+                    {/block:ItemImageUrl}
+                    {block:NoItemImageUrl}
+                        <img src="https://placehold.co/300x300/e2e8f0/cbd5e1?text=No+Image" alt="{ItemName}" class="h-40 object-cover" />
+                    {/block:NoItemImageUrl}
+                </div>
+                
+                <div class="p-4 flex flex-col flex-grow">
+                    <h3 class="text-base text-slate-800 font-semibold mb-2 flex-grow hover:text-emerald-600 cursor-pointer">
+                        <a href="{ItemUrl}">{ItemName}</a>
+                    </h3>
+                    
+                    <p class="text-sm text-gray-600 mt-1 mb-2">{ItemDescription}</p>
+                    
+                    {block:ItemIsReservation}
+                        <div class="my-2 p-2 bg-sky-50 border border-sky-200 rounded-md">
+                            <span class="text-xs font-bold bg-sky-500 text-white px-2 py-1 rounded-full">予約販売</span>
+                            <p class="text-sm text-sky-800 font-semibold mt-1">{ItemReservationNote}</p>
+                        </div>
+                    {/block:ItemIsReservation}
+                    
+                    <div class="mt-4 mb-4">
+                        <span class="text-2xl font-bold text-slate-800">¥{ItemPrice}</span>
+                        <span class="text-sm text-gray-500"> (税込)</span>
+                    </div>
 
-    <div id="login-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
-        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
-            <h2 class="text-2xl font-bold text-center mb-6">ログイン</h2>
-            <form id="login-form">
-                <div class="mb-4">
-                    <label for="login-email" class="block text-sm font-medium text-gray-700">メールアドレス</label>
-                    <input type="email" id="login-email" name="email" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
+                    {block:HasItemStock}
+                    <form action="/cart" method="post" class="mt-auto">
+                        <input type="hidden" name="item_id" value="{ItemID}">
+                        <input type="hidden" name="quantity" value="1">
+                        <button type="submit" class="w-full bg-amber-500 border border-amber-500 hover:bg-amber-600 text-white font-semibold py-2 rounded-lg shadow-sm transition-colors">
+                            カートに入れる
+                        </button>
+                    </form>
+                    {/block:HasItemStock}
+                    
+                    {block:NoItemStock}
+                    <button class="mt-auto w-full bg-gray-400 text-white font-semibold py-2 rounded-lg shadow-sm" disabled>
+                        SOLD OUT
+                    </button>
+                    {/block:NoItemStock}
                 </div>
-                <div class="mb-6">
-                    <label for="login-password" class="block text-sm font-medium text-gray-700">パスワード</label>
-                    <input type="password" id="login-password" name="password" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
-                </div>
-                <div class="flex items-center justify-between">
-                    <button type="button" id="login-modal-close-button" class="text-gray-600 hover:text-gray-700">キャンセル</button>
-                    <button type="submit" class="bg-emerald-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-emerald-700 transition">ログイン</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="cart-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-start z-50 p-4 pt-16 overflow-y-auto">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl">
-            <div class="p-6 border-b flex justify-between items-center">
-                <h2 class="text-2xl font-bold text-slate-800">ショッピングカート</h2>
-                <button id="cart-modal-close-button" class="text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
             </div>
-            <div id="cart-items-container" class="p-6 max-h-[60vh] overflow-y-auto">
-                </div>
-            <div id="cart-footer" class="p-6 bg-gray-50 rounded-b-lg">
-                <div id="cart-total-container" class="text-right mb-4">
-                     </div>
-                <button id="checkout-button" class="w-full bg-amber-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-amber-600 transition disabled:bg-gray-400">
-                    レジに進む
-                </button>
+            {/block:Items}
             </div>
-        </div>
-    </div>
 
+        {block:NoItems}
+            <p class="text-gray-500 text-center col-span-full">現在販売中の商品はありません。</p>
+        {/block:NoItems}
+
+    </main>
 
     <div id="notification" class="hidden fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-lg shadow-lg"></div>
 
@@ -61,9 +130,5 @@
         lucide.createIcons();
     </script>
     
-    <script src="firebase-config.js" type="module"></script>
-    <script src="shared.js" type="module"></script>
-    <script src="customer.js" type="module"></script>
-
-</body>
+    </body>
 </html>

@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ご注文ありがとうございます - NetSuper</title>
+    <title>{ShopName} | {PageTitle}</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-</head>
+    </head>
 <body class="bg-stone-50">
     <div class="container mx-auto max-w-2xl px-4 py-8 sm:py-12">
         <div class="text-center mb-8">
-            <a href="index.html" class="text-3xl font-bold text-emerald-800">NetSuper</a>
+            <a href="{ShopTopPath}" class="text-3xl font-bold text-emerald-800">NetSuper</a>
         </div>
         
         <div class="bg-white p-8 rounded-lg shadow-md text-center">
@@ -20,16 +21,16 @@
                 お支払いが正常に完了しました。<br>
                 ご登録のメールアドレスに確認メールを送信しましたので、ご確認ください。
             </p>
-            <a href="index.html" class="mt-8 inline-block bg-emerald-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-emerald-700 transition">
+            
+            <a href="{ShopTopPath}" class="mt-8 inline-block bg-emerald-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-emerald-700 transition">
                 お買い物を続ける
             </a>
         </div>
     </div>
     <script>
         lucide.createIcons();
-        // 決済完了後、カート情報をクリアする
-        localStorage.removeItem('cart');
+        // 決済完了後、カート情報をクリアする処理はBASEでは不要
+        // localStorage.removeItem('cart');
     </script>
 </body>
 </html>
-
